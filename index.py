@@ -43,7 +43,6 @@ class Notification:
     def post(self, event, value):
         data = {'value1': value}
         requests.post(self.iftt_url.format(event), json=data)
-        print('Notification sent to Telegram')
 
     def format_bitcoin_history(self):
         rows = []
