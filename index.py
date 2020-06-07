@@ -28,20 +28,13 @@ class Notification:
         self.upper_limit = config['upper_limit']
         self.is_active_limit_notification = False
         self.bitcoin_history = []
+        self.session = requests.Session()
 
     def get_quote(self):
-        parameters = {
-            'id': '1',
-        }
-        headers = {
-            'Accepts': 'application/json',
-            'X-CMC_PRO_API_KEY': self.coinMarket_api_key,
-        }
-        session = requests.Session()
-        session.headers.update(headers)
+        parameters = {'id': '1'}
         data = None
         try:
-            response = session.get(self.coinMarket_url, params=parameters)
+            response = self.session.get(self.coinMarket_url, params=parameters)
             data = json.loads(response.text)
         except (ConnectionError, Timeout, TooManyRedirects) as e:
             print(e)
@@ -50,6 +43,7 @@ class Notification:
     def post(self, event, value):
         data = {'value1': value}
         requests.post(self.iftt_url.format(event), json=data)
+        print('Notification sent to Telegram')
 
     def format_bitcoin_history(self):
         rows = []
@@ -69,12 +63,18 @@ class Notification:
             if self.is_active_limit_notification:
                 if price >= self.upper_limit or price <= self.lower_limit:
                     self.post('bitcoin_price_emergency', price)
+                    self.is_active_limit_notification = False
             if len(self.bitcoin_history) == 5:
                 self.post('bitcoin_price_update', self.format_bitcoin_history())
                 self.bitcoin_history = []
             time.sleep(300)
 
     def start(self):
+        headers = {
+            'Accepts': 'application/json',
+            'X-CMC_PRO_API_KEY': self.coinMarket_api_key,
+        }
+        self.session.headers.update(headers)
         current_quote = self.get_quote()
         print('''Welcome to CryptoCurrencies App
         Current bitcoin quote is: $ {}\n
@@ -82,8 +82,8 @@ class Notification:
         user_choice_notif = pyip.inputYesNo('Do you want to activate notifications on Telegram when bitcoin surges or '
                                             'falls to a upper and lower limit? (Y/N) > ')
         if user_choice_notif == 'yes':
-            print('The current limits are:\n\tupper limit: $ {}\n\tlower limit: $ {}'.format(self.upper_limit,
-                                                                                             self.lower_limit))
+            print('The current limits are:\n\tupper limit: ${}\n\tlower limit: ${}'.format(self.upper_limit,
+                                                                                           self.lower_limit))
             user_choice_conf = pyip.inputYesNo('Do you want to modify any of these parameters? (Y/N) > ')
             if user_choice_conf == 'yes':
                 set_config(current_quote)
