@@ -1,6 +1,0 @@
-{
-   "coinMarket_api_key": "987ec591-9f70-434a-8450-e909d7d849c4",
-   "iftt_webhook_url": "https://maker.ifttt.com/trigger/{}/with/key/c2Gbt5pW8_FyQaKRYAcXevqIGIdnXcIvtG4L3ep-9pc",
-   "upper_limit": 9400.00,
-   "lower_limit": 9000.00
-}

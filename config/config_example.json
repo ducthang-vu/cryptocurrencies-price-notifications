@@ -1,0 +1,6 @@
+{
+    "coinMarket_api_key": "xxx",
+    "iftt_webhook_url": "https://maker.ifttt.com/trigger/{}/with/key/xxx",
+    "upper_limit": 5000,
+    "lower_limit": 1000
+}
